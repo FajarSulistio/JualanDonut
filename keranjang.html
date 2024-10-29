@@ -15,26 +15,30 @@
           let selectedBoxes = [];
 
           // Loop untuk mengambil harga setiap box dari localStorage
-          for (let i = 1; i <= 6; i++) {
+          for (let i = 1; i <= 5; i++) {
               const price = parseInt(localStorage.getItem("price" + i)) || 0;
+              let quantity = parseInt(localStorage.getItem("quantity" + i)) || 1;
 
               // Jika box dipilih (price > 0), tampilkan harga dan tombol hapus
               if (price > 0) {
+                  const boxTotal = price * quantity;
                   priceDisplay.innerHTML += `
                       <div class="flex items-center justify-between mb-2">
-                          <span>Harga Box ${i}: ${price}</span>
-                          <button onclick="removeItem(${i})" class="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600">
-                              Hapus
-                          </button>
+                          <span>Harga Box ${i}: Rp${price} x ${quantity} = Rp${boxTotal}</span>
+                          <div class="flex space-x-2">
+                              <button onclick="updateQuantity(${i}, 'decrement')" class="bg-gray-300 text-black py-1 px-2 rounded">-</button>
+                              <button onclick="updateQuantity(${i}, 'increment')" class="bg-gray-300 text-black py-1 px-2 rounded">+</button>
+                              <button onclick="removeItem(${i})" class="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600">Hapus</button>
+                          </div>
                       </div>
                   `;
-                  total += price;
-                  selectedBoxes.push(`Box ${i} - Rp${price}`);
+                  total += boxTotal;
+                  selectedBoxes.push(`Box ${i} - Rp${price} x ${quantity} = Rp${boxTotal}`);
               }
           }
 
           // Tampilkan total harga
-          document.getElementById("totalDisplay").innerText = "Total Harga: " + total;
+          document.getElementById("totalDisplay").innerText = "Total Harga: Rp" + total;
 
           // Simpan informasi box dan total untuk checkout button
           const checkoutButton = document.getElementById("checkoutButton");
@@ -44,6 +48,19 @@
 
       function removeItem(boxNumber) {
           localStorage.removeItem("price" + boxNumber); // Hapus item dari localStorage
+          localStorage.removeItem("quantity" + boxNumber); // Hapus kuantitas dari localStorage
+          displayPricesAndTotal(); // Perbarui tampilan harga dan total
+      }
+
+      function updateQuantity(boxNumber, action) {
+          // Ambil kuantitas saat ini dari localStorage, atau default ke 1
+          let quantity = parseInt(localStorage.getItem("quantity" + boxNumber)) || 1;
+          if (action === "increment") {
+              quantity += 1; // Tambah kuantitas
+          } else if (action === "decrement" && quantity > 1) {
+              quantity -= 1; // Kurangi kuantitas jika lebih dari 1
+          }
+          localStorage.setItem("quantity" + boxNumber, quantity); // Simpan kuantitas yang diperbarui
           displayPricesAndTotal(); // Perbarui tampilan harga dan total
       }
 
@@ -57,7 +74,7 @@
           }
 
           // Membuat pesan dengan daftar box dan total harga
-          const boxList = selectedBoxes.join(", ");
+          const boxList = selectedBoxes.join("\n");
           const message = `Halo, saya ingin memesan:\n${boxList}\nTotal Harga: Rp${total}`;
           const phoneNumber = "6281293330431"; // Ganti dengan nomor WhatsApp yang dituju
           const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
@@ -94,7 +111,7 @@
               href="keranjang.html"
               class="group block">
                 <img
-                  src="C:\Users\62812\Downloads\png-clipart-web-development-e-commerce-shopping-cart-software-logo-online-shopping-business-web-design-service.png"
+                  src="img/png-clipart-web-development-e-commerce-shopping-cart-software-logo-online-shopping-business-web-design-service.png"
                   alt=""
                   class="size-10 rounded-lg object-cover"
                 />
