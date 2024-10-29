@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Document</title>
+    <script>
+      function displayPricesAndTotal() {
+          let total = 0;
+          const priceDisplay = document.getElementById("priceDisplay");
+          priceDisplay.innerHTML = ""; // Kosongkan konten sebelumnya
+
+          // Array untuk menyimpan informasi box yang dipilih
+          let selectedBoxes = [];
+
+          // Loop untuk mengambil harga setiap box dari localStorage
+          for (let i = 1; i <= 6; i++) {
+              const price = parseInt(localStorage.getItem("price" + i)) || 0;
+
+              // Jika box dipilih (price > 0), tampilkan harga dan tombol hapus
+              if (price > 0) {
+                  priceDisplay.innerHTML += `
+                      <div class="flex items-center justify-between mb-2">
+                          <span>Harga Box ${i}: ${price}</span>
+                          <button onclick="removeItem(${i})" class="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600">
+                              Hapus
+                          </button>
+                      </div>
+                  `;
+                  total += price;
+                  selectedBoxes.push(`Box ${i} - Rp${price}`);
+              }
+          }
+
+          // Tampilkan total harga
+          document.getElementById("totalDisplay").innerText = "Total Harga: " + total;
+
+          // Simpan informasi box dan total untuk checkout button
+          const checkoutButton = document.getElementById("checkoutButton");
+          checkoutButton.setAttribute("data-total", total);
+          checkoutButton.setAttribute("data-boxes", JSON.stringify(selectedBoxes));
+      }
+
+      function removeItem(boxNumber) {
+          localStorage.removeItem("price" + boxNumber); // Hapus item dari localStorage
+          displayPricesAndTotal(); // Perbarui tampilan harga dan total
+      }
+
+      function sendToWhatsApp() {
+          const total = document.getElementById("checkoutButton").getAttribute("data-total");
+          const selectedBoxes = JSON.parse(document.getElementById("checkoutButton").getAttribute("data-boxes"));
+          
+          if (!total || total === "0" || selectedBoxes.length === 0) {
+              alert("Tidak ada box yang dipilih.");
+              return;
+          }
+
+          // Membuat pesan dengan daftar box dan total harga
+          const boxList = selectedBoxes.join(", ");
+          const message = `Halo, saya ingin memesan:\n${boxList}\nTotal Harga: Rp${total}`;
+          const phoneNumber = "6281293330431"; // Ganti dengan nomor WhatsApp yang dituju
+          const url = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
+          
+          // Redirect ke WhatsApp dengan URL
+          window.location.href = url;
+      }
+  </script>
+</head>
+<body>
+         <!-- GARIS PALING ATAS -->
+         <div class="bg-indigo-600 px-4 py-3 text-white">
+            <p class="text-center text-sm font-medium">
+              Beli Donat Enak Dan Murah
+            </p>
+          </div>
+        <!-- END GARIS PALING ATAS-->
+      <!-- NAVBAR -->
+      <header class="bg-white">
+        <div class="mx-auto max-w-screen-xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+          <div class="flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900 sm:text-3xl">BELANJACUYY</h1>
+      
+              <p class="mt-1.5 text-sm text-gray-500">
+                BELANJA DONAT ENAK DAN MURAH
+              </p>
+            </div>
+      
+            <div class="flex items-center gap-4">
+
+              
+              <a 
+              href="keranjang.html"
+              class="group block">
+                <img
+                  src="C:\Users\62812\Downloads\png-clipart-web-development-e-commerce-shopping-cart-software-logo-online-shopping-business-web-design-service.png"
+                  alt=""
+                  class="size-10 rounded-lg object-cover"
+                />
+
+                <a 
+                href="index.html"
+                class="inline-block rounded bg-white-600 px-5 py-3 text-sm font-medium text-indigo transition hover:bg-indigo-700 focus:outline-none focus:ring"
+                type="button"
+              >
+                HOME
+
+                </a>
+              <a
+              href="about-us.html"
+              
+                class="inline-block rounded bg-indigo-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-indigo-700 focus:outline-none focus:ring"
+                type="button"
+              >
+                About Us
+            </a>
+            </div>
+          </div>
+        </div>
+      </header>
+    <!-- END NAVBAR -->
+
+  
+    <body onload="displayPricesAndTotal()">
+        <h2 class="text-center font-medium text-gray-900"
+        id="priceDisplay">Harga Box yang Dipilih:</h2>
+        <h3 class="text-center font-medium text-gray-900"
+        id="totalDisplay">Total Harga: -</h3>
+
+        <div class="flex justify-center">
+          <button id="checkoutButton" onclick="sendToWhatsApp()" 
+                  class="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600">
+              Checkout
+          </button>
+      </div>
+    </body>
+  
+
+  
+</body>
+</html>
